@@ -17,7 +17,15 @@ const port = process.env.PORT ?? "5000";
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? "*",
+    origin: (origin, callback) => {
+      const allowed = process.env.FRONTEND_URL?.replace(/\/$/, "");
+      if (!origin || !allowed || origin.replace(/\/$/, "") === allowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 app.use(express.json());
