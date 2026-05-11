@@ -98,7 +98,7 @@ router.post("/", authorize(["ADMIN"]), async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 12);
 
   try {
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const createdUser = await tx.user.create({
         data: {
           name,
@@ -158,7 +158,7 @@ router.patch("/:id", authorize(["ADMIN"]), async (req, res) => {
   }
 
   try {
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const existingUser = await tx.user.findUnique({
         where: { id: userId },
         select: publicUserSelect,

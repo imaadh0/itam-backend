@@ -195,7 +195,7 @@ router.post("/", authorize(["IT_MANAGER"]), async (req, res) => {
   }
 
   try {
-    const asset = await prisma.$transaction(async (tx) => {
+    const asset = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const createdAsset = await tx.asset.create({
         data: normalizeAssetInput(parsedBody.data),
         select: assetSelect,
@@ -281,7 +281,7 @@ router.patch("/:id", authorize(["IT_MANAGER"]), async (req, res) => {
   }
 
   try {
-    const asset = await prisma.$transaction(async (tx) => {
+    const asset = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const existingAsset = await tx.asset.findUnique({
         where: { id: assetId },
         select: assetSelect,
@@ -335,7 +335,7 @@ router.delete("/:id", authorize(["IT_MANAGER"]), async (req, res) => {
   const assetId = getRouteParam(req.params.id);
 
   try {
-    const deletedAsset = await prisma.$transaction(async (tx) => {
+    const deletedAsset = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const asset = await tx.asset.findUnique({
         where: { id: assetId },
         select: assetSelect,

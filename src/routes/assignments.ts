@@ -79,7 +79,7 @@ router.post("/", authorize(["IT_MANAGER", "IT_STAFF"]), async (req, res) => {
   const { assetId, userId } = parsedBody.data;
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const [asset, user, activeAssignment] = await Promise.all([
         tx.asset.findUnique({
           where: { id: assetId },
@@ -170,7 +170,7 @@ router.patch("/:id/return", authorize(["IT_MANAGER", "IT_STAFF"]), async (req, r
   const assignmentId = getRouteParam(req.params.id);
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const existingAssignment = await tx.assignment.findUnique({
         where: { id: assignmentId },
         include: assignmentInclude,
