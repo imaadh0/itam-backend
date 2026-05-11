@@ -1,12 +1,13 @@
-# dependencies
-/node_modules
-/dist
-
-# local env files
-.env
-.env.local
-.env.*.local
-
-# misc
-.DS_Store
+# dependencies
+/node_modules
+/dist
+
+# local env files
+.env
+.env.local
+.env.*.local
+
+# misc
+.DS_Store
 *.log
+config.bat
