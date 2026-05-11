@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  IT_MANAGER
+  IT_STAFF
+}
+
+enum AssetCategory {
+  LAPTOP
+  DESKTOP
+  MONITOR
+  PHONE
+  TABLET
+  PERIPHERAL
+  OTHER
+}
+
+enum AssetStatus {
+  AVAILABLE
+  ASSIGNED
+  UNDER_REPAIR
+  RETIRED
+}
+
+model User {
+  id             String       @id @default(cuid())
+  name           String
+  email          String       @unique
+  passwordHash   String
+  role           UserRole
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  isActive       Boolean      @default(true)
+
+  assignments    Assignment[] @relation("AssignedUser")
+  assignedAssets Assignment[] @relation("AssignedBy")
+  returnedAssets Assignment[] @relation("ReturnedBy")
+  auditLogs      AuditLog[]   @relation("AuditActor")
+}
+
+model Asset {
+  id           String        @id @default(cuid())
+  tag          String        @unique
+  brand        String
+  model        String
+  serialNumber String        @unique
+  purchaseCost Decimal
+  category     AssetCategory
+  status       AssetStatus
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  assignments  Assignment[]
+}
+
+model Assignment {
+  id           String    @id @default(cuid())
+  assetId      String
+  userId       String
+  assignedById String
+  assignedAt   DateTime  @default(now())
+  returnedAt   DateTime?
+  returnedById String?
+
+  asset        Asset     @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  user         User      @relation("AssignedUser", fields: [userId], references: [id], onDelete: Restrict)
+  assignedBy   User      @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: Restrict)
+  returnedBy   User?     @relation("ReturnedBy", fields: [returnedById], references: [id], onDelete: Restrict)
+
+  @@index([assetId])
+  @@index([userId])
+  @@index([assignedById])
+  @@index([returnedById])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  action    String
+  entity    String
+  entityId  String
+  diff      Json
+  createdAt DateTime @default(now())
+
+  actor     User     @relation("AuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
